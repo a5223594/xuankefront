@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生选课系统</title>
+    <script src="js/vue.js"></script>
+    <script src="js/axios.min.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="css/index.css">
+    <!-- 引入组件库 -->
+    <script src="js/index.js"></script>
+</head>
+<body>
+<div id="index">
+
+    <el-menu class="el-menu-demo" mode="horizontal"
+             background-color="#545c64"
+             text-color="#fff"
+             active-text-color="#ffd04b">
+        <el-submenu index="1">
+            <template slot="title">欢迎，{{student.name}}</template>
+            <el-menu-item index="1-1" >
+                <el-popover
+                        placement="right"
+                        width="400"
+                        trigger="click">
+
+
+                    <span slot="reference">click 激活</span>
+                </el-popover>
+            </el-menu-item>
+            <el-menu-item index="1-2" >修改密码</el-menu-item>
+        </el-submenu>
+    </el-menu>
+</div>
+<script type="text/javascript">
+    axios.interceptors.request.use(
+        config => {
+            const token = localStorage.getItem("token");
+            if (token) {
+                config.headers.Authorization = token;
+            }
+            return config;
+        },
+        error => {
+            return Promise.reject(error)
+        });
+    var Main = {
+        data() {
+            return {
+                menus: [],
+                student:''
+            };
+        },
+        methods: {
+            getInformation(){
+                this.$alert("asdasd", '提示', {
+                    confirmButtonText: '确定'
+                });
+            },
+            getMyCourse(){
+
+            }
+
+        },
+        created(){
+            axios.get("http://localhost:8080/student")
+                .then(response => this.student=response.data.data);
+            axios.post("http://localhost:8080/menu")
+                .then(response => this.menus = response.data.data);
+        }
+    };
+    var Ctor = Vue.extend(Main);
+    new Ctor().$mount('#index');
+</script>
+</body>
+
+</html>
