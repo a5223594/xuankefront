@@ -21,12 +21,17 @@
             <template slot="title">欢迎，{{student.name}}</template>
             <el-menu-item index="1-1" >
                 <el-popover
-                        placement="right"
-                        width="400"
+                        transition="fade-in-linear"
+                        placement="bottom"
                         trigger="click">
-
-
-                    <span slot="reference">click 激活</span>
+                    <el-table :data="students">
+                        <el-table-column width="100" property="id" label="学号"></el-table-column>
+                        <el-table-column property="name" label="姓名"></el-table-column>
+                        <el-table-column property="major" label="专业"></el-table-column>
+                        <el-table-column property="academy" label="学院"></el-table-column>
+                        <el-table-column property="grade" label="年级"></el-table-column>
+                    </el-table>
+                    <span slot="reference">个人信息</span>
                 </el-popover>
             </el-menu-item>
             <el-menu-item index="1-2" >修改密码</el-menu-item>
@@ -49,14 +54,13 @@
         data() {
             return {
                 menus: [],
-                student:''
+                student:'',
+                students: []
             };
         },
         methods: {
             getInformation(){
-                this.$alert("asdasd", '提示', {
-                    confirmButtonText: '确定'
-                });
+                return "asdasd"
             },
             getMyCourse(){
 
@@ -65,13 +69,19 @@
         },
         created(){
             axios.get("http://localhost:8080/student")
-                .then(response => this.student=response.data.data);
+                .then(response => {
+                    this.student = response.data.data;
+                    this.students.push(this.student)
+                    }
+                );
             axios.post("http://localhost:8080/menu")
                 .then(response => this.menus = response.data.data);
         }
+
     };
     var Ctor = Vue.extend(Main);
     new Ctor().$mount('#index');
+
 </script>
 </body>
 
