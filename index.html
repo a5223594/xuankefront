@@ -19,7 +19,7 @@
              active-text-color="#ffd04b">
         <el-submenu index="1">
             <template slot="title">欢迎，{{student.name}}</template>
-            <el-menu-item index="1-1" >
+            <el-menu-item index="1-1">
                 <el-popover
                         transition="fade-in-linear"
                         placement="bottom"
@@ -34,9 +34,26 @@
                     <span slot="reference">个人信息</span>
                 </el-popover>
             </el-menu-item>
-            <el-menu-item index="1-2" >修改密码</el-menu-item>
+            <el-menu-item index="1-2" @click="getMyCourse()">我的课表</el-menu-item>
+            <el-menu-item index="1-3">修改密码</el-menu-item>
         </el-submenu>
     </el-menu>
+
+    <div v-if="mycourse!=''">
+        <template>
+            <el-table :data="mycourse" style="width: 100%" :row-class-name="tableRowClassName">
+                <el-table-column prop="id" label="课程编号"></el-table-column>
+                <el-table-column prop="name" label="课程名"></el-table-column>
+                <el-table-column prop="teacher" label="老师"></el-table-column>
+                <el-table-column prop="number" label="课程人数"></el-table-column>
+                <el-table-column prop="selected" label="已选人数"></el-table-column>
+                <el-table-column prop="grade" label="年级"></el-table-column>
+            </el-table>
+        </template>
+    </div>
+    <div>
+        asdasd
+    </div>
 </div>
 <script type="text/javascript">
     axios.interceptors.request.use(
@@ -54,24 +71,34 @@
         data() {
             return {
                 menus: [],
-                student:'',
-                students: []
+                student: '',
+                students: [],
+                mycourse: []
+
             };
         },
         methods: {
-            getInformation(){
+            getInformation() {
                 return "asdasd"
             },
-            getMyCourse(){
-
+            getMyCourse() {
+                axios.get("http://localhost:8080/course/mycourse")
+                    .then(response => {
+                            let temp = response.data.data;
+                            for(let index in temp) {
+                                //学院限制得改成字符串，不能是array
+                            }
+                            console.log(temp)
+                        }
+                    );
             }
 
         },
-        created(){
+        created() {
             axios.get("http://localhost:8080/student")
                 .then(response => {
-                    this.student = response.data.data;
-                    this.students.push(this.student)
+                        this.student = response.data.data;
+                        this.students.push(this.student)
                     }
                 );
             axios.post("http://localhost:8080/menu")
