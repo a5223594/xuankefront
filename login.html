@@ -58,7 +58,7 @@
                         }
                     };
                     if (this.userinfo.picked === 'student') {
-                        let res = await axios.post('http://127.0.0.1:8080/student/login', formData, config);
+                        let res = await axios.post('http://127.0.0.1:8080/student/login', formData,config);
                         if(res.data.code === 20002){
                             this.$alert(res.data.message, '提示', {
                                 confirmButtonText: '确定'
