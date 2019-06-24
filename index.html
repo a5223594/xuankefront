@@ -51,7 +51,7 @@
                 </el-table>
                 <div v-if="t==3">
                     <div>
-                        <el-select clearable v-model="formData.teacher" placeholder="老师姓名">
+                        <el-select size="mini" clearable v-model="formData.teacher" placeholder="老师姓名">
                             <el-option
                                     v-for="item in teachers"
                                     :key="item"
@@ -59,7 +59,7 @@
                                     :value="item">
                             </el-option>
                         </el-select>
-                        <el-select clearable v-model="formData.academy" placeholder="学院名称">
+                        <el-select size="mini" clearable v-model="formData.academy" placeholder="学院名称">
                             <el-option
                                     v-for="item in academys"
                                     :key="item"
@@ -67,10 +67,10 @@
                                     :value="item">
                             </el-option>
                         </el-select>
-                        <el-button type="primary" @click="filterCourse()" icon="el-icon-search">筛选</el-button>
-                        <el-input style="width:200px;" v-model="courseid" placeholder="请输入课程编号">
+                        <el-button size="mini" type="primary" @click="filterCourse()" icon="el-icon-search">筛选</el-button>
+                        <el-input size="mini" style="width:200px;" v-model="courseid" placeholder="请输入课程编号">
                         </el-input>
-                        <el-button type="primary" @click="findCourse()" icon="el-icon-search">搜索</el-button>
+                        <el-button size="mini" type="primary" @click="findCourse()" icon="el-icon-search">搜索</el-button>
                     </div>
                     <el-table :data="courses"
                               style="width: 100%">
@@ -102,6 +102,13 @@
                             </template>
                     </el-table-column>
                 </el-table>
+                    <el-pagination
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage"
+                            :page-size="5"
+                            layout="total, prev, pager, next, jumper"
+                            :total="total">
+                    </el-pagination>
                 </div>
                 </template>
             </el-main>
@@ -131,6 +138,8 @@
                 academys:[],
                 courses:[],
                 courseid:'',
+                currentPage:1,
+                total:10,
                 formData:{
                     teacher:'',
                     academy:''
@@ -189,20 +198,22 @@
                     });
             },
             getCourse(){
-                axios.get("http://localhost:8080/course")
+                axios.get("http://localhost:8080/course/page/"+this.currentPage)
                     .then(response => {
-                        let temp = response.data.data;
+                        let temp = response.data.data.rows;
                         for (let i in temp) {
                             let als = temp[i].als;
                             let filters = als.map((item) => item.academy);
                             temp[i].als = filters.join(',');
                         }
                         this.courses = temp;
+                        this.total = response.data.data.total;
                         this.t =3
                     });
             },
-            current_change:function(currentPage){
+            handleCurrentChange:function(currentPage){
                 this.currentPage = currentPage;
+                this.getCourse();
             }
         },
 
