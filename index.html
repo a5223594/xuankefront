@@ -72,14 +72,35 @@
                         </el-input>
                         <el-button type="primary" @click="findCourse()" icon="el-icon-search">搜索</el-button>
                     </div>
-                    <el-table :data="courses" style="width: 100%">
-                    <el-table-column property="id" label="课程编号"></el-table-column>
-                    <el-table-column property="name" label="课程名"></el-table-column>
-                    <el-table-column property="teacher" label="老师"></el-table-column>
-                    <el-table-column property="number" width="90px" label="课程人数"></el-table-column>
+                    <el-table :data="courses"
+                              style="width: 100%">
+                    <el-table-column property="id" width="90px" label="课程编号"></el-table-column>
+                    <el-table-column property="name" label="课程名程"></el-table-column>
+                    <el-table-column property="teacher" width="90px" label="老师名称"></el-table-column>
+                    <el-table-column property="number" width="90px" label="人数限制"></el-table-column>
                     <el-table-column property="selected" width="90px" label="已选人数"></el-table-column>
-                    <el-table-column property="grade"  label="年级"></el-table-column>
-                    <el-table-column property="als" label="学院"></el-table-column>
+                    <el-table-column property="grade" width="90px" label="年级"></el-table-column>
+                    <el-table-column property="als" label="学院限制"></el-table-column>
+                    <el-table-column label="操作">
+                            <template slot-scope="scope">
+                                <el-button
+                                        v-if="d(scope.row)"
+                                        disabled
+                                        size="mini"
+                                        type="Info">已选</el-button>
+                                <el-button
+                                        v-if="!d(scope.row)"
+                                        :disabled="scope.row.number===scope.row.selected"
+                                        size="mini"
+                                        type="success"
+                                        @click="handleEdit(scope.$index, scope.row)">选择</el-button>
+                                <el-button
+                                        v-if="d(scope.row)"
+                                        size="mini"
+                                        type="danger"
+                                        @click="handleDelete(scope.$index, scope.row)">退课</el-button>
+                            </template>
+                    </el-table-column>
                 </el-table>
                 </div>
                 </template>
@@ -114,6 +135,14 @@
                     teacher:'',
                     academy:''
                 },
+                d(row){
+                    let array = this.mycourse.map((item)=>item.id);
+                    for (i = 0; i < array.length; i++) {
+                        if(array[i]===row.id)
+                            return true;
+                    }
+                    return false;
+                },
                 t:1
             };
         },
@@ -122,18 +151,7 @@
                 this.t =1
             },
             getMyCourse() {
-                axios.get("http://localhost:8080/course/mycourse",)
-                    .then(response => {
-                            let temp = response.data.data;
-                            for (let i in temp) {
-                                let als = temp[i].als;
-                                let filters = als.map((item) => item.academy);
-                                temp[i].als = filters.join(',')
-                            }
-                            this.mycourse = temp;
-                            this.t =2
-                        }
-                    );
+                this.t = 2
             },
             findCourse() {
                 if(this.courseid!=null&& this.courseid.trim()!==''){
@@ -167,6 +185,7 @@
                         }
                         this.courses = temp;
                         this.t =3
+
                     });
             },
             getCourse(){
@@ -181,8 +200,12 @@
                         this.courses = temp;
                         this.t =3
                     });
+            },
+            current_change:function(currentPage){
+                this.currentPage = currentPage;
             }
         },
+
         created() {
             axios.get("http://localhost:8080/student")
                 .then(response => {
@@ -198,6 +221,18 @@
             axios.get("http://localhost:8080/course/academy")
                 .then(response => {
                         this.academys = Array.from(response.data.data);
+                    }
+                );
+            axios.get("http://localhost:8080/course/mycourse")
+                .then(response => {
+                        let temp = response.data.data;
+                        for (let i in temp) {
+                            let als = temp[i].als;
+                            let filters = als.map((item) => item.academy);
+                            temp[i].als = filters.join(',')
+                        }
+                        this.mycourse = temp;
+                        this.t =2
                     }
                 );
         }
